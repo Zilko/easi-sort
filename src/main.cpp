@@ -3,6 +3,60 @@
 #include "UI/SortLayer.hpp"
 
 #include <Geode/modify/LevelBrowserLayer.hpp>
+#include <Geode/modify/LevelListLayer.hpp>
+#include <Geode/modify/LevelCell.hpp>
+
+class $modify(LevelListLayer) {
+
+    void onToggleEditMode(CCObject*) {
+        if (auto layer = SortLayer::create(this)) {
+            layer->show();
+        }
+    }
+
+};
+
+class $modify(LevelCell) {
+
+    void loadCustomLevelCell() {
+        LevelCell::loadCustomLevelCell();
+
+        if (!m_compactView) {
+            return;
+        }
+
+        auto mainLayer = getChildByID("main-layer");
+
+        if (!mainLayer) {
+            return;
+        }
+
+        auto menu = mainLayer->getChildByID("main-menu");
+
+        if (!menu) {
+            return;
+        }
+
+        auto spr = CCSprite::createWithSpriteFrameName("GJ_trashBtn_001.png");
+        spr->setScale(0.45f);
+
+        auto btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(LevelCell::onClick));
+        btn->setPosition({-3.5f, -135});
+        btn->setID("delete-button"_spr);
+        btn->setTag(4);
+
+        menu->addChild(btn);
+
+        auto viewBtn = menu->getChildByID("view-button");
+
+        if (!viewBtn) {
+            return;
+        }
+
+        static_cast<CCMenuItemSpriteExtra*>(viewBtn)->m_pNormalImage->setScale(0.85f);
+    }
+
+};
 
 class $modify(ProLevelBrowserLayer, LevelBrowserLayer) {
     

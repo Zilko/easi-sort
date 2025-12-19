@@ -98,10 +98,38 @@ void SortLayer::updateCells() {
                 }
             }
 
-            if (m_type != SearchType::MyLevels) {
+            if (m_type != SearchType::MyLevels && m_type != SearchType::Type26) {
                 auto prevIndex = m_movingCell->getIndex();
                 m_movingCell->setIndex(nextCell->getIndex());
                 nextCell->setIndex(prevIndex);
+            } else if (m_type == SearchType::Type26) {
+                int l1 = -1, l2 = -1;
+                auto cells = m_browserLayer->m_list->m_listView->m_tableView->m_contentLayer->getChildrenExt<LevelCell*>();
+                
+                for (int i = 0; i < cells.size(); i++) {
+                    auto level = cells[i]->m_level;
+                    
+                    if (l1 <= -1 && level == m_movingCell->getLevel()) {
+                        l1 = i;
+                    } else if (l2 <= 2 && level == nextCell->getLevel()) {
+                        l2 = i;
+                    }
+                    
+                    if (l1 <= -1 || l2 <= -1) {
+                        continue;
+                    }
+
+                    LevelBrowserLayer* layer = m_browserLayer;
+
+                    static_cast<LevelListLayer*>(layer)->cellPerformedAction(
+                        cells[l1],
+                        static_cast<int>(cells[l1]->m_listType),
+                        cells[l1]->m_level->m_listPosition < cells[l2]->m_level->m_listPosition ? CellAction::Down : CellAction::Up,
+                        nullptr
+                    );
+
+                    break;
+                }
             } else {
                 int l1 = -1, l2 = -1;
                 
@@ -141,7 +169,7 @@ void SortLayer::updateCells() {
             }
         }
         
-        if (didSwap) {
+        if (didSwap && m_type != SearchType::Type26) {
             auto prevY = m_browserLayer->m_list->m_listView->m_tableView->m_contentLayer->getPositionY();
             m_browserLayer->loadPage(m_browserLayer->m_searchObject);
             m_browserLayer->m_list->m_listView->m_tableView->m_contentLayer->setPositionY(prevY);
@@ -363,7 +391,7 @@ bool SortLayer::setup() {
     
     for (const auto& level : m_allLevels) {
         if (
-            (m_folder == 0 || level->m_levelFolder == m_folder)
+            (m_folder == 0 || level->m_levelFolder == m_folder || m_type == SearchType::Type26)
             && (m_type != SearchType::FavouriteLevels || level->m_levelFavorited)
         ) {
             auto cell = Cell::create(level, this);
@@ -412,7 +440,16 @@ SortLayer::SortLayer(Ref<LevelBrowserLayer> browserLayer) : m_browserLayer(brows
         m_type != SearchType::FavouriteLevels
         && m_type != SearchType::SavedLevels
         && m_type != SearchType::MyLevels
+        && m_type != SearchType::Type26 // list
     ) {
+        return;
+    }
+
+    if (m_type == SearchType::Type26) {
+        for (const auto& cell : m_browserLayer->m_list->m_listView->m_tableView->m_contentLayer->getChildrenExt<LevelCell*>()) {
+            m_allLevels.push_back(cell->m_level);
+        }
+
         return;
     }
     
