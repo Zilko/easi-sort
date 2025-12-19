@@ -21,7 +21,7 @@ class $modify(LevelCell) {
     void loadCustomLevelCell() {
         LevelCell::loadCustomLevelCell();
 
-        if (!m_compactView) {
+        if (!m_compactView || m_listType != BoomListType::Level4) {
             return;
         }
 
