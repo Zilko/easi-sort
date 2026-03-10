@@ -170,9 +170,13 @@ void SortLayer::updateCells() {
         }
         
         if (didSwap && m_type != SearchType::Type26) {
+            CCTouchDispatcher::get()->unregisterForcePrio(this);
+
             auto prevY = m_browserLayer->m_list->m_listView->m_tableView->m_contentLayer->getPositionY();
             m_browserLayer->loadPage(m_browserLayer->m_searchObject);
             m_browserLayer->m_list->m_listView->m_tableView->m_contentLayer->setPositionY(prevY);
+
+            CCTouchDispatcher::get()->registerForcePrio(this, 2);
         }
     }
 }
