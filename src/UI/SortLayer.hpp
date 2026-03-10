@@ -4,7 +4,7 @@
 
 class MyScrollLayer;
 
-class SortLayer : public Popup<> {
+class SortLayer : public Popup {
   
 private:
 
@@ -42,7 +42,7 @@ private:
     bool m_isMoving = false;
     bool m_lockSnap = false;
 
-    bool setup() override;
+    bool init() override;
     
     void updateCells();
     void updateScroll(float, const CCPoint&);

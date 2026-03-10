@@ -371,7 +371,8 @@ void SortLayer::onRelease(const CCPoint& pos) {
     m_snapToCell->setGrabbed(false);
 }
 
-bool SortLayer::setup() {
+bool SortLayer::init() {
+    Popup::init(213.f, 262.f);
     setTitle("Sort Levels");
     
     float gap = 5.f;
@@ -478,7 +479,7 @@ SortLayer::SortLayer(Ref<LevelBrowserLayer> browserLayer) : m_browserLayer(brows
 SortLayer* SortLayer::create(Ref<LevelBrowserLayer> browserLayer) {
     auto ret = new SortLayer(browserLayer);
     
-    if (ret->initAnchored(213.f, 262.f)) {
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
